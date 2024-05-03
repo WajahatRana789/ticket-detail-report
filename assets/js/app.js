@@ -101,6 +101,9 @@ const secondsToReadableTime = (totalSeconds) => {
 
     return timeString.trim();
 };
+const arraySum = (arr) => {
+    return arr.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+}
 const calcArrayAverage = (array) => {
     const sum = array.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
     return sum / array.length;
@@ -148,20 +151,15 @@ const populateAverageOfServiceChart = (data) => {
         averageOfServiceChartCtx.resize();
     }, 100);
 }
-const populateAverageOfServiceTable = (data) => {
+const populateAverageOfServiceTable = (totalServiceTime, totalServiceTimeAvg, totalServiceCount, data) => {
     const tbody = $('#averageOfServiceTable').find('tbody');
     const tfoot = $('#averageOfServiceTable').find('tfoot');
 
     tbody.empty();
 
-    let serviceTimeAvgGrandTotal = 0;
-    let serviceCountGrandTotal = 0;
 
     data.forEach(entry => {
         const { operator, serviceCount, avgInSeconds, avgHumanize, avgMoreReadable } = entry;
-
-        serviceTimeAvgGrandTotal += avgInSeconds;
-        serviceCountGrandTotal += serviceCount;
 
         const { cls } = getAvgServiceTimeBenchmarkColor(avgInSeconds);
 
@@ -180,8 +178,8 @@ const populateAverageOfServiceTable = (data) => {
         tbody.append(tr);
     });
 
-    tfoot.find('th:nth-child(2)').html(serviceCountGrandTotal);
-    tfoot.find('th:nth-child(3)').html(secondsToTimeString(serviceTimeAvgGrandTotal));
+    tfoot.find('th:nth-child(2)').html(totalServiceCount);
+    tfoot.find('th:nth-child(3)').html(secondsToTimeString(totalServiceTimeAvg));
 
     populateAverageOfServiceChart(data);
 
@@ -197,8 +195,8 @@ const calcAverageOfServiceByOperators = (data) => {
     const result = [];
     uniqueOperators.forEach(operator => {
         const filteredDataByOperator = data.filter(x => x.operator_name == operator);
-        const serviceTimeSeconds = filteredDataByOperator.map(x => x.service_time_seconds);
-        const serviceCount = filteredDataByOperator.length;
+        const serviceTimeSeconds = filteredDataByOperator.map(x => x.service_time_seconds).filter(x => x > 0);
+        const serviceCount = serviceTimeSeconds.length;
 
         const avg = Math.floor(calcArrayAverage(serviceTimeSeconds));
         result.push({
@@ -210,7 +208,12 @@ const calcAverageOfServiceByOperators = (data) => {
         });
     });
     result.sort((a, b) => a.avgInSeconds - b.avgInSeconds);
-    return result;
+
+    const totalServiceTime = arraySum(result.map(x => x.avgInSeconds));
+    const totalServiceTimeAvg = Math.round(totalServiceTime / uniqueOperators.length);
+    const totalServiceCount = arraySum(result.map(x => x.serviceCount));
+
+    return { totalServiceTime, totalServiceTimeAvg, totalServiceCount, result };
 }
 const convertParsedDataToArrayOfObjects = (parsedData) => {
     const headers = parsedData[0].map(header => header.toLowerCase().replace(/\s+/g, '_'));
@@ -315,8 +318,8 @@ const handleParsedData = (parsedData) => {
 
     renderFilters();
 
-    const result = calcAverageOfServiceByOperators(data);
-    populateAverageOfServiceTable(result);
+    const { totalServiceTime, totalServiceTimeAvg, totalServiceCount, result } = calcAverageOfServiceByOperators(data);
+    populateAverageOfServiceTable(totalServiceTime, totalServiceTimeAvg, totalServiceCount, result);
 }
 const handleFileChange = (e) => {
     const input = e.currentTarget;
@@ -390,8 +393,8 @@ const handleClickApplyFilters = () => {
         selectedCategories.includes(item.category_name)
     );
 
-    const result = calcAverageOfServiceByOperators(filteredData);
-    populateAverageOfServiceTable(result);
+    const { totalServiceTime, totalServiceTimeAvg, totalServiceCount, result } = calcAverageOfServiceByOperators(filteredData);
+    populateAverageOfServiceTable(totalServiceTime, totalServiceTimeAvg, totalServiceCount, result);
 
 }
 
