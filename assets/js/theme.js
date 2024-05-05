@@ -1,5 +1,3 @@
-
-
 $('#btn-toggle-side-menu').on('click', () => {
     $('html').toggleClass('side-menu-open');
 });
@@ -20,3 +18,8 @@ const handleClickMenuItem = (e) => {
     $('#' + sectionID).show();
 }
 $('#menuList li').on('click', handleClickMenuItem);
+$(document).ready(function () {
+    if ($(window).width() <= 767) {
+        $('html').removeClass('side-menu-open');
+    }
+});
