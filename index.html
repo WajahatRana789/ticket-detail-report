@@ -15,7 +15,7 @@
 
 <body>
     <div class="app" id="app">
-        <div class="overlay"></div>
+        <div class="overlay" id="app-overlay"></div>
         <header class="app-header">
             <div class="app-header-left">
                 <button class="btn btn-light app-menu-toggle-button" id="btn-toggle-side-menu">
@@ -30,13 +30,14 @@
                     <img src="logo.png" alt="logo">
                     <div>Ticket Detail Report</div>
                 </a>
-                <!-- <button class="btn btn-light app-menu-close-button" id="btn-close-side-menu">
+                <button class="btn btn-light app-menu-close-button" id="btn-close-side-menu">
                     <i class="bx bx-x"></i>
-                </button> -->
+                </button>
             </div>
             <ul class="app-menu-list show-scroll" id="menuList">
                 <li data-section="fu" class="active">File Upload</li>
                 <li data-section="ast">Average Of Service</li>
+                <li data-section="cos">Count Of Service</li>
                 <li data-section="awt">Average Of Wait</li>
                 <li data-section="help">Help</li>
             </ul>
@@ -96,39 +97,97 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12 col-sm-12 col-md-7">
-                                <table class="table ast-table" id="avgOfServiceTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Operator</th>
-                                            <th>Count Of Service</th>
-                                            <th>Average Of Service</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                    <tfoot>
-                                        <th>Grand Total</th>
-                                        <th>0</th>
-                                        <th>0</th>
-                                    </tfoot>
-                                </table>
-                                <div id="avgOfServiceChart" style="width: 100%; height: 200px;"></div>
-                            </div>
-                            <div class="col-12 col-sm-12 col-md-5">
-                                <div style="display: none;">
-                                    <table class="table" id="avgOfService_Table">
+                                <div class="table-responsive">
+                                    <table class="table ast-table" id="avgOfServiceTable">
                                         <thead>
                                             <tr>
                                                 <th>Operator</th>
-                                                <th>Counter</th>
-                                                <th>Category</th>
+                                                <th>Average Of Service</th>
                                             </tr>
                                         </thead>
+                                        <tbody></tbody>
+                                        <tfoot>
+                                            <th>Total</th>
+                                            <th>0</th>
+                                        </tfoot>
                                     </table>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-12 col-md-5">
+                                <div style="display: none;">
+                                    <div class="table-responsive">
+                                        <table class="table" id="avgOfService_Table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Operator</th>
+                                                    <th>Counter</th>
+                                                    <th>Category</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div id="avgOfService_Table_FiltersContainer"></div>
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h4 class="card-title">Average Of Service</h4>
+                            <small class="text-muted">By Categories & Operators</small>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 col-sm-12 col-md-12">
+                                <div style="display: none;">
+                                    <div class="table-responsive">
+                                        <table class="table" id="avgOfServiceByOptAndCat_Table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Operator</th>
+                                                    <th>Counter</th>
+                                                    <th>Category</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="avgOfServiceByOptAndCat_Table_FiltersContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="avgOfServiceByOptAndCat_Result" class="table-responsive"></div>
+                </div>
+            </section>
+            <section id="cos" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Count Of Service</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 col-sm-12 col-md-12">
+                                <div style="display: none;">
+                                    <div class="table-responsive">
+                                        <table class="table" id="countOfService_Table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Operator</th>
+                                                    <th>Counter</th>
+                                                    <th>Category</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="countOfService_Table_FiltersContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="countOfService_Result" class="table-responsive"></div>
                 </div>
             </section>
             <section id="awt" style="display: none;">
@@ -139,34 +198,38 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12 col-sm-12 col-md-7">
-                                <table class="table ast-table" id="avgOfWaitTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Operator</th>
-                                            <th>Count Of Service</th>
-                                            <th>AverageOf Wait</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                    <tfoot>
-                                        <th>Grand Total</th>
-                                        <th>0</th>
-                                        <th>0</th>
-                                    </tfoot>
-                                </table>
+                                <div class="table-responsive">
+                                    <table class="table" id="avgOfWaitTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Operator</th>
+                                                <th>Count Of Service</th>
+                                                <th>AverageOf Wait</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                        <tfoot>
+                                            <th>Grand Total</th>
+                                            <th>0</th>
+                                            <th>0</th>
+                                        </tfoot>
+                                    </table>
+                                </div>
                                 <div id="avgOfWaitChart" style="width: 100%; height: 200px;"></div>
                             </div>
                             <div class="col-12 col-sm-12 col-md-5">
                                 <div style="display: none;">
-                                    <table class="table" id="avgOfWait_Table">
-                                        <thead>
-                                            <tr>
-                                                <th>Operator</th>
-                                                <th>Counter</th>
-                                                <th>Category</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
+                                    <div class="table-responsive">
+                                        <table class="table" id="avgOfWait_Table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Operator</th>
+                                                    <th>Counter</th>
+                                                    <th>Category</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div id="avgOfWait_Table_FiltersContainer"></div>
                             </div>
@@ -204,6 +267,9 @@
         });
     </script>
     <script src="./assets/js/theme.js"></script>
+
+    <script src="./assets/js/global.js"></script>
+    <script src="./assets/js/filter.js"></script>
     <script src="./assets/js/app.js"></script>
 </body>
 

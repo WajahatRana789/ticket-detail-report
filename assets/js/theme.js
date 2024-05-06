@@ -1,3 +1,10 @@
+const initTooltip = () => {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+}
+
 $('#btn-toggle-side-menu').on('click', () => {
     $('html').toggleClass('side-menu-open');
 });
@@ -14,10 +21,14 @@ const handleClickMenuItem = (e) => {
     $('#menuList li').removeClass('active');
     $('section').hide();
     li.addClass('active');
-
     $('#' + sectionID).show();
+
+    initTooltip();
 }
 $('#menuList li').on('click', handleClickMenuItem);
+$('#app-overlay, #btn-close-side-menu').on('click', () => {
+    $('html').removeClass('side-menu-open');
+});
 $(document).ready(function () {
     if ($(window).width() <= 767) {
         $('html').removeClass('side-menu-open');

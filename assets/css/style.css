@@ -10,6 +10,20 @@
     --default-hover-color: #F3F6F9;
     --bs-primary: #0d6efd;
     --bs-primary-light: rgba(13, 110, 253, .12);
+    --bs-secondary: #82868b;
+    --bs-secondary-light: rgba(130, 134, 139, 0.12);
+    --bs-success: #28c76f;
+    --bs-success-light: rgba(40, 199, 111, 0.12);
+    --bs-info: #00cfe8;
+    --bs-info-light: rgba(0, 207, 232, 0.12);
+    --bs-warning: #ff9f43;
+    --bs-warning-light: rgba(255, 159, 67, 0.12);
+    --bs-danger: #ea5455;
+    --bs-danger-light: rgba(234, 84, 85, 0.12);
+    --light: #f6f6f6;
+    --dark: #4b4b4b;
+    --dark-border: #2e3956;
+    --light-border: #cdcdcd;
 }
 
 .dark:root {
@@ -227,10 +241,12 @@ body {
     align-items: center;
 }
 
-.app-menu-toggle-button {
+.app-menu-toggle-button,
+.app-menu-close-button {
     position: relative;
     width: 36px;
     height: 36px;
+    padding: 18px;
     border-radius: 50% !important;
     -webkit-border-radius: 50% !important;
     -moz-border-radius: 50% !important;
@@ -240,8 +256,11 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 0;
     font-size: 20px;
+}
+
+.app-menu-close-button {
+    display: none;
 }
 
 /* theme switch start */
@@ -407,7 +426,9 @@ body {
     backdrop-filter: blur(6px);
     z-index: 1001;
     padding: 0.5rem 0.75rem;
-    height: 86px;
+    height: 58px;
+    display: flex;
+    align-items: center;
 }
 
 .app-menu-header .app-menu-header-logo {
@@ -422,14 +443,14 @@ body {
 }
 
 .app-menu-header .app-menu-header-logo img {
-    width: 56px;
-    height: 56px;
+    width: 46px;
+    height: 46px;
     object-fit: contain;
 }
 
 .app-menu-header .app-menu-header-logo div {
     margin-left: 0.5rem;
-    font-size: 1.175rem;
+    font-size: 1.075rem;
     white-space: nowrap;
     top: 3px;
 }
@@ -438,7 +459,7 @@ body {
     position: relative;
     height: calc(100% - 58px);
     margin: 0;
-    padding: 0 0.75rem;
+    padding: 1rem 0.75rem 0 0.75rem;
     list-style: none;
     overflow-y: auto;
 }
@@ -593,6 +614,15 @@ label {
     -o-border-radius: var(--default-border-radius);
 }
 
+.form-control:focus,
+.form-select:focus {
+    color: var(--color);
+    background-color: #fff;
+    outline: 0;
+    box-shadow: 0 0 0 1px var(--bs-primary);
+    border-color: transparent;
+}
+
 .form-switch .form-check-input {
     z-index: 2;
 }
@@ -632,6 +662,7 @@ label {
     -moz-border-radius: var(--default-border-radius);
     -ms-border-radius: var(--default-border-radius);
     -o-border-radius: var(--default-border-radius);
+    margin-bottom: 1rem;
 }
 
 .card-header {
@@ -810,6 +841,7 @@ tr.tDnD_whileDrag {
 
 table th {
     background-color: #f8f9fa !important;
+    font-weight: 500;
 }
 
 .table.nowrap th,
@@ -1107,6 +1139,34 @@ table.dataTable>tbody>tr.edited>* {
     position: relative;
     box-shadow: 1px 1px 1px var(--default-border-color);
     cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.filters-dropdown .filter-icon {
+    position: relative;
+    width: 26px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.filters-dropdown .filter-text {
+    position: relative;
+    margin: 0 4px;
+    flex: 1;
+}
+
+.filters-dropdown .arrow-icon {
+    position: relative;
+    width: 26px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    text-align: right;
 }
 
 .filters-container.show .filters-dropdown {
@@ -1152,7 +1212,7 @@ table.dataTable>tbody>tr.edited>* {
 
 .filters-card-header {
     position: relative;
-    padding: 8px;
+    padding: 6px;
 }
 
 .filter-card-body {
@@ -1165,7 +1225,7 @@ table.dataTable>tbody>tr.edited>* {
     margin: 0;
     padding: 0;
     list-style: none;
-    max-height: 150px;
+    max-height: 120px;
     overflow-y: auto;
 }
 
@@ -1212,6 +1272,36 @@ table.dataTable>tbody>tr.edited>* {
 
 /* filters end */
 
+
+.good {
+    background-color: var(--bs-success-light) !important;
+    color: var(--bs-success) !important;
+}
+
+.normal {
+    background-color: var(--bs-warning-light) !important;
+    color: var(--bs-warning) !important;
+}
+
+.bad {
+    background-color: var(--bs-danger-light) !important;
+    color: var(--bs-danger) !important;
+}
+
+.count-of-service-table td,
+.count-of-service-table th {
+    font-size: 0.785rem;
+}
+
+.count-of-service-table th {
+    font-weight: 500;
+}
+
+.count-of-service-table tr th:nth-child(1) {
+    text-align: left !important;
+    white-space: nowrap;
+}
+
 @media(max-width: 767px) {
     .side-menu-open .app-header {
         left: 0;
@@ -1228,5 +1318,9 @@ table.dataTable>tbody>tr.edited>* {
 
     .side-menu-open .overlay {
         display: block;
+    }
+
+    .side-menu-open .app-menu-close-button {
+        display: flex;
     }
 }
