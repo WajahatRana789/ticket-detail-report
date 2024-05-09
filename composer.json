@@ -1,0 +1,17 @@
+{
+    "name": "wajahat/ticket-detail-report",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Wajahat Rana"
+        }
+    ],
+    "require": {
+        "shuchkin/simplexlsx": "^1.1",
+        "shuchkin/simplexls": "^0.10.4"
+    }
+}

@@ -1,4 +1,4 @@
-
+const allowedExtensions = ['xls', 'xlsx'];
 const getAvgServiceTimeBenchmarkColor = (seconds) => {
     let cls = 'bad';
     let color = 'rgba(234, 84, 85, 1)';
@@ -94,18 +94,18 @@ const filterAvgOfServiceDataByOptAndCat = (data) => {
         let categoryCount = 0;
         for (const operator in result[category]) {
             const { totalTime, count } = result[category][operator];
-            const averageTime = totalTime / count;
+            const averageTime = Math.round(totalTime / count);
             result[category][operator].averageTime = averageTime;
             categoryTotalTime += totalTime;
             categoryCount += count;
 
             // Update column averages
             if (totalTime > 0) {
-                colAverages[operator].averageTime = (colAverages[operator].totalTime / colAverages[operator].count);
+                colAverages[operator].averageTime = Math.round((colAverages[operator].totalTime / colAverages[operator].count));
             }
         }
         // Update row averages
-        rowAverages[category] = categoryTotalTime / categoryCount;
+        rowAverages[category] = Math.round(categoryTotalTime / categoryCount);
     }
 
     return { result, rowAverages, colAverages };
@@ -149,12 +149,13 @@ const populateAvgOfServiceByOptAndCatTable = (data) => {
     let overallColumnTotalTime = 0;
     let overallColumnCount = 0;
     operators.forEach(operator => {
-        const seconds = colAverages[operator].averageTime;
+        const seconds = Math.round(colAverages[operator].averageTime);
         const { cls } = getAvgServiceTimeBenchmarkColor(seconds);
         tableHTML += `<th class="${cls}">${secondsToTimeString(seconds)}</th>`;
         overallColumnTotalTime += colAverages[operator].totalTime;
         overallColumnCount += colAverages[operator].count;
     });
+
     const overallColumnAverage = overallColumnCount > 0 ? Math.round(overallColumnTotalTime / overallColumnCount) : 0;
     const { cls } = getAvgServiceTimeBenchmarkColor(overallColumnAverage);
     tableHTML += `<th class="${cls}">${secondsToTimeString(overallColumnAverage)}</th></tr>`;
@@ -221,7 +222,7 @@ const calcAvgOfServiceByOperators = (data) => {
         const serviceTimeSeconds = filteredDataByOperator.map(x => x.service_time_seconds).filter(x => x > 0);
         const serviceCount = serviceTimeSeconds.length;
 
-        const avg = Math.floor(calcArrayAvg(serviceTimeSeconds));
+        const avg = Math.round(calcArrayAvg(serviceTimeSeconds));
         result.push({
             operator,
             serviceCount,
@@ -278,7 +279,7 @@ const calcAvgOfWaitByOperators = (data) => {
         const waitTimeSeconds = filteredDataByOperator.map(x => x.wait_time_seconds).filter(x => x > 0);
         const waitCount = waitTimeSeconds.length;
 
-        const avg = Math.floor(calcArrayAvg(waitTimeSeconds));
+        const avg = Math.round(calcArrayAvg(waitTimeSeconds));
         result.push({
             operator,
             waitCount,
@@ -366,11 +367,11 @@ const populateSections = () => {
     populateCountOfServiceSection();
     populateAvgOfWaitSection();
 }
-const handleParsedData = (parsedData) => {
-    const convertedData = convertParsedDataToArrayOfObjects(parsedData);
-    const data = [];
+const submitFileSuccess = (response) => {
+    const { data, message } = response;
 
-    convertedData.forEach(entry => {
+    const result = [];
+    data.forEach(entry => {
         const { operator_name, category_name, service_time, wait_time, counter_id } = entry;
         const obj = {
             operator_name: operator_name,
@@ -381,24 +382,67 @@ const handleParsedData = (parsedData) => {
             wait_time: wait_time,
             wait_time_seconds: timeToSeconds(wait_time)
         }
-        data.push(obj);
+        result.push(obj);
     });
 
-    GLOBAL_STATE.data = data;
+    GLOBAL_STATE.data = result;
 
-    const uniqueCounters = getUniqueCounters(data)
-    const uniqueCategories = getUniqueCategories(data);
-    const uniqueOperators = getUniqueOperators(data);
+    const uniqueCounters = getUniqueCounters(result)
+    const uniqueCategories = getUniqueCategories(result);
+    const uniqueOperators = getUniqueOperators(result);
 
     GLOBAL_STATE.counters = uniqueCounters;
     GLOBAL_STATE.categories = uniqueCategories;
     GLOBAL_STATE.operators = uniqueOperators;
 
     populateSections();
+}
+const submitFile = (data) => {
+    $.ajax({
+        url: 'process.php',
+        type: 'POST',
+        data: data,
+        contentType: false,
+        processData: false,
+        success: (response) => {
+            submitFileSuccess(response);
+        },
+        error: (error) => {
+            const msg = error.responseJSON.message;
+            showError('Error', msg);
+        },
+        complete: () => {
+            setTimeout(() => {
+                $.LoadingOverlay('hide');
+            }, 100);
+        }
+    });
+}
+const handleClickSubmit = () => {
+    const file = $('#fileInput')[0].files[0];
+    if (!file) {
+        showError('Error', 'Please select a file');
+        return;
+    }
+    const filename = file.name;
+    let extension = filename.split('.').pop();
+    if (extension && typeof extension === 'string') {
+        extension = extension.toLowerCase();
+    }
 
+    if (!allowedExtensions.includes(extension)) {
+        $('#filename').html('');
+        showError('Error', 'Invalid file extension. Please upload a .xls or .xlsx file.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    $.LoadingOverlay('show');
     setTimeout(() => {
-        $.LoadingOverlay('hide');
-    }, 500);
+        submitFile(formData);
+    }, 100);
 }
 const handleFileChange = (e) => {
     const input = e.currentTarget;
@@ -413,46 +457,16 @@ const handleFileChange = (e) => {
         extension = extension.toLowerCase();
     }
 
-    if (extension !== 'csv') {
+    if (!allowedExtensions.includes(extension)) {
         $('#filename').html('');
-        $('#fileErrorText').html('Invalid file extension. Please upload a .csv file.');
+        $('#fileErrorText').html('Invalid file extension. Please upload a .xls or .xlsx file.');
         return;
     }
 
     $('#btnSubmit').show();
 }
-const handleClickSubmit = () => {
-    const file = $('#fileInput')[0].files[0];
-    if (!file) {
-        showError('Error', 'Please select a file');
-        return;
-    }
-    const filename = file.name;
-    let extension = filename.split('.').pop();
-    if (extension && typeof extension === 'string') {
-        extension = extension.toLowerCase();
-    }
 
-    if (extension !== 'csv') {
-        $('#filename').html('');
-        showError('Error', 'Invalid file extension. Please upload a .csv file.');
-        return;
-    }
-
-    $('#btnSubmit').show();
-    $.LoadingOverlay('show');
-    setTimeout(() => {
-        Papa.parse(file, {
-            complete: function (results) {
-                const data = results.data;
-                handleParsedData(data);
-            },
-            error: function (error) {
-                $.LoadingOverlay('hide');
-                alert(error.message);
-            }
-        });
-    }, 500);
-}
-$('#fileInput').on('change', handleFileChange);
-$('#btnSubmit').on('click', handleClickSubmit);
+$(document).ready(function () {
+    $('#fileInput').on('change', handleFileChange);
+    $('#btnSubmit').on('click', handleClickSubmit);
+});

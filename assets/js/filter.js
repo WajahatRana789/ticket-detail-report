@@ -172,6 +172,38 @@ const handleSearchItemsInFilter = (e) => {
         $(label).toggle(text.indexOf(value) > -1);
     });
 }
+const createFilterToggleSelection = (sectionId, tableId, column) => {
+    const columnName = column.filter.columnName;
+
+    const id = sectionId + tableId + columnName + '_selectAllCheckbox';
+
+    const div = $('<div></div>');
+    div.attr('class', 'toggle-selection-wrapper');
+
+    const checkbox = $('<input/>');
+    checkbox.attr('type', 'checkbox');
+    checkbox.attr('class', 'filter-checkbox');
+    checkbox.attr('id', id);
+    checkbox.prop('checked', true);
+
+
+    checkbox.on('change', function () {
+        const isChecked = $(this).prop('checked');
+        const checkboxList = $(this).closest('.filters-card').find('ul > li input[type="checkbox"]');
+        $(checkboxList).prop('checked', isChecked);
+    });
+
+
+    const label = $('<label></label>');
+    label.attr('for', id);
+
+    const span = $('<span></span>');
+    span.html('Select All');
+
+    div.append(checkbox).append(label).append(span);
+
+    return div;
+}
 const creatFilterCard = (sectionId, tableId, column) => {
 
     const columnName = column.filter.columnName;
@@ -184,12 +216,22 @@ const creatFilterCard = (sectionId, tableId, column) => {
     const header = $('<div></div>');
     header.attr('class', 'filters-card-header');
 
+    const tools = $('<div></div>');
+    tools.attr('class', 'header-tools');
+
+    const searchInputWrapper = $('<div></div>');
+    searchInputWrapper.attr('class', 'search-input-wrapper');
+
     const searchInput = $('<input/>');
     searchInput.attr('type', 'search');
     searchInput.attr('class', 'form-control form-control-sm');
     searchInput.attr('placeholder', 'Search ' + columnText);
     searchInput.on('input', handleSearchItemsInFilter);
-    header.append(searchInput);
+    searchInputWrapper.append(searchInput);
+
+    const toggleSelectionContainer = createFilterToggleSelection(sectionId, tableId, column);
+    tools.append(searchInputWrapper).append(toggleSelectionContainer);
+    header.append(tools);
 
     const body = $('<div></div>');
     body.attr('class', 'filter-card-body');
