@@ -80,11 +80,12 @@ const filterAvgOfServiceDataByOptAndCat = (data) => {
             result[category_name][operator_name].count++;
         }
 
-        // Calculate column sums
+        // Calculate column sums and averages
         if (service_time_seconds > 0) {
-            colAverages[operator_name] = (colAverages[operator_name] || { totalTime: 0, count: 0 });
+            colAverages[operator_name] = colAverages[operator_name] || { totalTime: 0, count: 0 };
             colAverages[operator_name].totalTime += service_time_seconds;
             colAverages[operator_name].count++;
+            colAverages[operator_name].averageTime = Math.round(colAverages[operator_name].totalTime / colAverages[operator_name].count);
         }
     });
 
@@ -98,13 +99,7 @@ const filterAvgOfServiceDataByOptAndCat = (data) => {
             result[category][operator].averageTime = averageTime;
             categoryTotalTime += totalTime;
             categoryCount += count;
-
-            // Update column averages
-            if (totalTime > 0) {
-                colAverages[operator].averageTime = Math.round((colAverages[operator].totalTime / colAverages[operator].count));
-            }
         }
-        // Update row averages
         rowAverages[category] = Math.round(categoryTotalTime / categoryCount);
     }
 
@@ -133,7 +128,7 @@ const populateAvgOfServiceByOptAndCatTable = (data) => {
             const cellData = result[category][operator];
             if (cellData) {
                 const seconds = Math.round(cellData.averageTime);
-                tableHTML += `<td>${secondsToTimeString(seconds)}</td>`;
+                tableHTML += `<td data-seconds="${seconds}">${secondsToTimeString(seconds)}</td>`;
                 rowTotalTime += cellData.totalTime;
                 rowCount += cellData.count;
             } else {
@@ -147,14 +142,15 @@ const populateAvgOfServiceByOptAndCatTable = (data) => {
     // Render table footer with column averages
     tableHTML += '<tr><th>Total</th>';
     let overallColumnTotalTime = 0;
-    let overallColumnCount = 0;
+    let overallColumnCount = operators.length;
     operators.forEach(operator => {
         const seconds = Math.round(colAverages[operator].averageTime);
         const { cls } = getAvgServiceTimeBenchmarkColor(seconds);
-        tableHTML += `<th class="${cls}">${secondsToTimeString(seconds)}</th>`;
-        overallColumnTotalTime += colAverages[operator].totalTime;
-        overallColumnCount += colAverages[operator].count;
+        tableHTML += `<th data-seconds="${seconds}" class="${cls}">${secondsToTimeString(seconds)}</th>`;
+
+        overallColumnTotalTime += seconds;
     });
+
 
     const overallColumnAverage = overallColumnCount > 0 ? Math.round(overallColumnTotalTime / overallColumnCount) : 0;
     const { cls } = getAvgServiceTimeBenchmarkColor(overallColumnAverage);
@@ -267,7 +263,13 @@ const populateAvgOfServiceTable = (data) => {
         tbody.append(tr);
     });
 
-    tfoot.find('th:nth-child(2)').html(secondsToTimeString(totalServiceTimeAvg));
+    const { cls } = getAvgServiceTimeBenchmarkColor(totalServiceTimeAvg);
+    tfoot.find('th:nth-child(2)')
+        .attr('class', cls)
+        .attr('data-bs-toggle', 'tooltip')
+        .attr('data-bs-placement', 'top')
+        .attr('title', secondsToReadableTime(totalServiceTimeAvg))
+        .html(secondsToTimeString(totalServiceTimeAvg));
 }
 const calcAvgOfWaitByOperators = (data) => {
     const operators = data.map(x => x.operator_name);

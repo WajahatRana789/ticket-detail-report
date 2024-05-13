@@ -60,7 +60,6 @@ while ($retry_count < $retry_limit) {
     array_shift($rows);
 }
 
-
 // Retry limit reached, handle error or notify user
 if ($retry_count == $retry_limit) {
     $msg = 'Required keys: ' . implode(', ', $required_keys);
@@ -68,17 +67,12 @@ if ($retry_count == $retry_limit) {
     ApiResponse::internal_server_error($msg);
     exit();
 }
-
+if ($retry_count <= 0) {
+    array_shift($rows);
+}
 $data = array_slice($rows, $retry_count, count($rows));
-
 $result = array_map(function ($row) use ($headers) {
     return array_combine($headers, $row);
 }, $data);
 
 ApiResponse::ok('Processing successfull', $result);
-
-// if ($excel = SimpleXLS::parseFile($file_tmp)) {
-    
-// } else {
-//     ApiResponse::internal_server_error(SimpleXLS::parseError());
-// }

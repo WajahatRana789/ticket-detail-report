@@ -78,11 +78,9 @@
                                     <div id="fileErrorText" class="text-danger file-error"></div>
                                 </div>
                                 <label for="fileInput"></label>
-                                <input id="fileInput" type="file"
-                                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                                <input id="fileInput" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
                             </div>
-                            <button class="btn btn-primary w-100 mt-2" id="btnSubmit"
-                                style="display: none;">Submit</button>
+                            <button class="btn btn-primary w-100 mt-2" id="btnSubmit" style="display: none;">Submit</button>
                         </div>
                     </div>
                 </div>
@@ -264,11 +262,17 @@
             custom: '<div class="spinner-border text-primary" role="status"></div>'
         });
     </script>
-    <script src="./assets/js/theme.js"></script>
 
-    <script src="./assets/js/global.js"></script>
-    <script src="./assets/js/filter.js"></script>
-    <script src="./assets/js/app.js"></script>
+    <?php
+    $scripts = ['theme.js', 'global.js', 'filter.js', 'app.js'];
+    foreach ($scripts as $path) {
+        $full_path = "./assets/js/$path";
+        if (file_exists($full_path)) {
+            $last_modified = filemtime($full_path);
+            echo "<script src=\"$full_path?v=$last_modified\"></script>\n";
+        }
+    }
+    ?>
 </body>
 
 </html>
