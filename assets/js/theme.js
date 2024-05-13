@@ -24,11 +24,19 @@ const handleClickMenuItem = (e) => {
     $('#' + sectionID).show();
 
     initTooltip();
+
+    if ($(window).width() <= 767) {
+        $('html').removeClass('side-menu-open');
+    }
 }
 $('#menuList li').on('click', handleClickMenuItem);
 $('#app-overlay, #btn-close-side-menu').on('click', () => {
     $('html').removeClass('side-menu-open');
 });
+
+$('[data-section]').hide();
+$('[data-section="fu"]').show();
+
 $(document).ready(function () {
     if ($(window).width() <= 767) {
         $('html').removeClass('side-menu-open');

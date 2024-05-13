@@ -398,6 +398,9 @@ const submitFileSuccess = (response) => {
     GLOBAL_STATE.operators = uniqueOperators;
 
     populateSections();
+
+    $('[data-section]').show();
+    $('[data-section="ast"]').click();
 }
 const submitFile = (data) => {
     $.ajax({

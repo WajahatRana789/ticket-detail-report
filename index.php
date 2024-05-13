@@ -37,7 +37,7 @@
             <ul class="app-menu-list show-scroll" id="menuList">
                 <li data-section="fu" class="active">File Upload</li>
                 <li data-section="ast">Average Of Service</li>
-                <li data-section="cos">Count Of Service</li>
+                <li data-section="cos">Workload</li>
                 <li data-section="awt">Average Of Wait</li>
                 <li data-section="help">Help</li>
             </ul>
@@ -161,7 +161,7 @@
             <section id="cos" style="display: none;">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Count Of Service</h4>
+                        <h4 class="card-title">Workload</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
